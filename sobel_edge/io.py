@@ -17,7 +17,8 @@ def load_image(source: str | Path | np.ndarray) -> np.ndarray:
     """
     if isinstance(source, np.ndarray):
         if source.ndim == 2:
-            return source.astype(np.uint8)
+            # 使用 round 避免浮点截断（如 12.7 → 13 而非 12）
+            return np.round(source).astype(np.uint8)
         if source.ndim == 3:
             # 彩色转灰度：使用 PIL
             return np.array(Image.fromarray(source).convert("L"), dtype=np.uint8)

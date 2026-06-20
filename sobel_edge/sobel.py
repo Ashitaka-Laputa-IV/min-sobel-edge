@@ -32,9 +32,13 @@ def _convolve2d(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
 def sobel_edge(image: np.ndarray, threshold: int | None = None) -> np.ndarray:
     """对灰度图像执行 Sobel 边缘检测。
 
+    梯度幅值始终归一化到 0-255 范围后再应用阈值，因此 threshold 是相对于
+    归一化后的像素值（0-255），而非原始梯度值。
+
     Args:
         image: 输入灰度图像（2D numpy 数组，值域 0-255）
-        threshold: 可选阈值，低于此值的梯度置为 0。默认 None（不设阈值）
+        threshold: 可选阈值（0-255），低于此值的归一化梯度置为 0。
+                   默认 None（不设阈值）
 
     Returns:
         边缘梯度幅值图（uint8，0-255）
@@ -81,6 +85,12 @@ def sobel_gradient_direction(image: np.ndarray) -> np.ndarray:
 
 def classify_direction(angles: np.ndarray) -> np.ndarray:
     """将梯度方向角离散分类为 4 个方向。
+
+    角度区间划分（以度为单位，归一化到 [0, 180)）：
+      - 水平 (0): [0°, 22.5°) ∪ [157.5°, 180°)
+      - 垂直 (1): [67.5°, 112.5°)
+      - +45° 对角线 (2): [22.5°, 67.5°)
+      - -45° 对角线 (3): [112.5°, 157.5°)
 
     Args:
         angles: arctan2 返回的梯度方向角（弧度）
